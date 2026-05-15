@@ -1,0 +1,631 @@
+/*RESET CSS*/
+*,
+::before,
+::after {
+    box-sizing: border-box
+}
+
+* {
+    margin: 0;
+    padding: 0
+}
+
+html:focus-within {
+    scroll-behavior: smooth
+}
+
+a:not([class]) {
+    text-decoration-skip-ink: auto
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+    font-style: italic
+}
+
+a,
+input,
+button,
+textarea,
+select {
+    font: inherit
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+        scroll-behavior: auto
+    }
+
+    *,
+    ::before,
+    ::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+        transition: none
+    }
+}
+
+body,
+html {
+    height: 100%;
+    scroll-behavior: smooth
+}
+
+/*------------------------------------------------------------------------------------*/
+
+/*STILE GENERALE*/
+body {
+    font-family: "Merriweather", serif;
+    background-color: #313131;
+    overflow-x: hidden;
+}
+
+.overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: #31313186;
+    z-index: 9998;
+}
+
+.hidden {
+    display: none;
+}
+
+/*------------------------------------------------------------------------------------*/
+
+/*STILE SCHERMATA 1*/
+.schermata-1 {
+    max-width: 800px;
+    background-color: #313131;
+    color: #C1CBD9;
+    margin: 50px auto;
+    text-align: center;
+    padding: 200px 40px;
+    border-radius: 50px;
+    border: 3px solid #C1FF72;
+    box-shadow: 0px 10px 30px #0000009e;
+    transition: all 0.5s ease-in-out;
+    animation: drop 0.8s ease-out;
+}
+
+@keyframes drop {
+    from {
+        transform: translateY(-700px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.logo h1 {
+    font-weight: normal;
+    font-size: 80px;
+    letter-spacing: 10px;
+    margin: 5px 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.logo p span {
+    background-color: #C1FF72;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+
+}
+
+.logo p {
+    font-size: 20px;
+    margin-bottom: 75px;
+    transition: all 0.3s ease-in-out;
+}
+
+.user-input {
+    display: flex;
+    justify-content: center;
+}
+
+.user-input input {
+    padding: 10px 20px;
+    height: 50px;
+    max-width: 300px;
+    font-size: 20px;
+    margin: 15px;
+    background-color: transparent;
+    border: 3px solid #C1CBD9;
+    border-radius: 15px;
+    color: #C1CBD9;
+}
+
+.user-input input:nth-child(1):focus {
+    border: 3px solid #C1FF72;
+    color: #C1FF72;
+    outline: none;
+    transition: color 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.user-input input:nth-child(2):focus {
+    border: 3px solid #0097B2;
+    color: #0097B2;
+    outline: none;
+    transition: color 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+#startBtn {
+    padding: 10px 200px;
+    border-radius: 15px;
+    margin-top: 10px;
+    background-color: #C1FF72;
+    border: none;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 0 20px 0 transparent;
+    transition: all 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+#startBtn:hover {
+    cursor: pointer;
+    background-color: #87b151;
+}
+
+/* MEDIA QUERY SCHERMATA 1 */
+@media (max-width: 1024px) {
+    .schermata-1 {
+        padding: 100px 20px;
+        margin: 50px auto;
+    }
+
+    .logo h1 {
+        font-size: 60px;
+        letter-spacing: 5px;
+    }
+
+    .logo p {
+        font-size: 18px;
+        margin-bottom: 50px;
+    }
+
+    .user-input {
+        flex-direction: column;
+        align-items: center;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .user-input input {
+        margin: 10px 0;
+        width: 80%;
+        max-width: none;
+    }
+
+    #startBtn {
+        padding: 10px 100px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 830px) {
+    .schermata-1 {
+        padding: 100px 20px;
+        margin: 50px 20px;
+    }
+
+    .logo h1 {
+        font-size: 45px;
+        letter-spacing: 5px;
+    }
+
+    .logo p {
+        font-size: 16px;
+        margin-bottom: 50px;
+    }
+
+    .user-input {
+        flex-direction: column;
+        align-items: center;
+        max-width: 400px;
+        margin: 0 auto;
+        font-size: medium;
+    }
+
+    .user-input input {
+        margin: 10px 0;
+        width: 80%;
+        max-width: none;
+    }
+
+    #startBtn {
+        padding: 10px 100px;
+        font-size: 18px;
+    }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* STILE ALERT (MODIFICATO DINAMICAMENTE CON JS) */
+.alert {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: #444444;
+    border: 5px solid rgb(228, 64, 64);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    font-family: "Merriweather", serif;
+    font-size: 25px;
+    text-align: right;
+    color: #C1CBD9;
+    min-width: 250px;
+    z-index: 9999;
+    animation: fadeInAlert 0.5s ease-in-out;
+}
+
+@keyframes fadeInAlert {
+    from {
+        opacity: 0;
+        top: 40%;
+    }
+
+    to {
+        opacity: 1;
+        top: 50%;
+    }
+}
+
+.alert p {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.alert button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    width: 100%;
+    border: none;
+    background: rgb(228, 64, 64);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.alert button:hover {
+    background: rgb(177, 51, 51);
+}
+
+/*------------------------------------------------------------------------*/
+
+/*STILE SCHERMATA 2*/
+.schermata-2 {
+    background-color: #313131;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeInSc2 0.8s ease-in-out;
+}
+
+@keyframes fadeInSc2 {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.giocatori {
+    padding-top: 100px;
+    margin: 0 50px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 30px;
+    border-bottom: 2px solid #C1CBD9;
+    max-width: 100%;
+}
+
+.container-p1,
+.container-p2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.giocatore1 {
+    color: #C1FF72;
+
+}
+
+.giocatore2 {
+    color: #0097B2;
+}
+
+.punteggi {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.punteggio1,
+.punteggio2 {
+    background-color: #545454;
+    margin: 10px 103px 20px 103px;
+    padding: 5px 30px;
+    border-left: solid 5px #545454;
+    border-right: solid 5px #545454;
+    border-radius: 30px;
+    color: #C1CBD9;
+    font-size: 30px;
+}
+
+.container-round p {
+    color: #C1CBD9;
+    font-size: 30px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.griglia {
+    max-width: 396px;
+    margin: 50px auto;
+    text-align: center;
+    font-family: Arial;
+}
+
+.riga div {
+    width: 120px;
+    height: 120px;
+    margin: 6px;
+    border: solid 3px #C1CBD9;
+    border-radius: 15%;
+    font-size: 70px;
+    padding: 18px;
+}
+
+.riga {
+    display: flex;
+}
+
+.riga div:hover {
+    background-color: #C1CBD9;
+    /* potrei mettere un colore diverso a seconda del giocatore 1 o 2*/
+}
+
+.turn-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.turn-container p {
+    margin-top: 50px;
+    font-style: Arial;
+    font-size: 22px;
+    color: #C1CBD9;
+}
+
+#turnOf {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+/* MEDIA QUERY SCHERMATA 2 */
+@media (max-width: 1024px) {
+    .giocatori {
+        margin: 0 100px;
+        font-size: 25px;
+    }
+
+    .punteggio1,
+    .punteggio2 {
+        margin: 10px 80px 20px 80px;
+        font-size: 20px;
+    }
+
+    .container-round p {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 740px) {
+    .giocatori {
+        margin: 0 20px;
+        font-size: 25px;
+    }
+
+    .punteggio1,
+    .punteggio2 {
+        margin: 10px;
+        margin-bottom: 20px;
+        font-size: 20px;
+        padding: 5px 20px;
+    }
+
+    .container-round {
+        margin-top: -75px;
+    }
+
+    .container-round p {
+        font-size: 20px;
+    }
+}
+
+/*------------------------------------------------------------------*/
+
+/* SCHERMATA 3 */
+.schermata-3 {
+    background-color: #313131;
+    color: #e5e5e5;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-top: 0;
+}
+
+.result-container {
+    text-align: center;
+    border: 3px solid #C1FF72;
+    padding: 30px 60px;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px #0000009e;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.titolo {
+    font-size: 60px;
+    margin-bottom: 15px;
+    font-weight: 400;
+    color: #C1CBD9;
+}
+
+#player-winner {
+    color: #C1CBD9;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.mosse-title {
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 300;
+}
+
+.mosse-list {
+    font-size: 20px;
+    line-height: 32px;
+    margin-bottom: 45px;
+}
+
+.btn-ricomincia {
+    padding: 15px 40px;
+    font-size: 25px;
+    font-weight: bold;
+    font-family: "Arial", sans-serif;
+    background-color: #C1FF72;
+    border: none;
+    color: #313131;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-ricomincia:hover {
+    background-color: #87b151;
+}
+
+.player-score-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0 auto 40px auto;
+}
+
+.player-names {
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.player-scores {
+    display: flex;
+    justify-content: space-between;
+}
+
+.player-label {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.x-label {
+    color: #C1FF72
+}
+
+.o-label {
+    color: #0097B2
+}
+
+.score-circle {
+    width: 55px;
+    height: 35px;
+    background-color: #4a4a4a;
+    border-radius: 25px;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.score-divider {
+    border: none;
+    height: 2px;
+    background-color: #b8b8d4;
+    margin-bottom: 40px;
+}
+
+.history-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.round {
+    margin-top: 10px;
+    font-size: 20px;
+    text-align: left;
+}
+
+#round1hystory,
+#round2hystory,
+#round3hystory {
+    padding-top: 10px;
+    line-height: 1.5;
+    text-align: left;
+    max-width: 85px;
+    margin: 0 auto;
+    font-family: Arial;
+}
+
+
+/* MEDIA QUERY SCHERMATA 3 */
+@media (max-width: 540px) {
+    .result-container {
+        padding: 30px;
+        margin: 10px;
+    }
+}
