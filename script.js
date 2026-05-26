@@ -394,3 +394,28 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 })
+
+const regPass = document.getElementById("reg_password");
+const regSubmit = document.getElementById("reg_submit");
+
+regPass.addEventListener("input", () => {
+    const val = regPass.value;
+    
+    // Regole Regex
+    const criteria = {
+        len: val.length >= 8 && val.length <= 12,
+        upper: /[A-Z]/.test(val),
+        lower: /[a-z]/.test(val),
+        num: /\d/.test(val),
+        spec: /[@#!$]/.test(val)
+    };
+
+    // Aggiornamento classi CSS per il feedback visivo
+    for (const [id, met] of Object.entries(criteria)) {
+        const el = document.getElementById(id);
+        el.style.color = met ? "#C1FF72" : "red"; // Verde se ok, rosso se manca
+    }
+
+    // Abilita il bottone solo se tutti i criteri sono soddisfatti
+    regSubmit.disabled = !Object.values(criteria).every(Boolean);
+});

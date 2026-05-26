@@ -1,269 +1,328 @@
 <?php
-    error_reporting(0);
+// 1. INIZIALIZZAZIONE E CONNESSIONE
+session_start(); // Fondamentale per CAPTCHA e 2FA
+error_reporting(E_ALL); // Attivato per il debug
+
+$ip_utente = $_SERVER['REMOTE_ADDR']; // Recupero IP per Anti-Flood e Log
+$limite_tentativi = 5;
+$intervallo_minuti = 2;
+
+try {
+    $connessione = new mysqli("localhost", "root", "root", "tic_tac_toe");
+} catch (mysqli_sql_exception $e) {
+    die("Errore di connessione: " . $e->getMessage());
+}
+
+// ---------------------------------------------------------
+// 2. LOGICA DI CONTROLLO ACCESSI (BACKEND)
+// ---------------------------------------------------------
+
+// A. PROTEZIONE ANTI-FLOOD
+$check_flood = $connessione->query("
+    SELECT COUNT(*) as totale FROM tentativi_accesso 
+    WHERE ip_address = '$ip_utente' 
+    AND tentativo_timestamp > (NOW() - INTERVAL $intervallo_minuti MINUTE)
+    AND esito = 'fallimento'
+");
+$dati_flood = $check_flood->fetch_assoc();
+
+if ($dati_flood['totale'] >= $limite_tentativi) {
+    die("Troppi tentativi falliti. Il tuo IP ($ip_utente) è temporaneamente bloccato.");
+}
+
+// B. GESTIONE LOGOUT
+if(isset($_POST['logout'])){
+    setcookie("utenti_id", "", strtotime("-1 hour"));
+    header("Location: index.php");
+    exit;
+}
+
+// C. ANNULLAMENTO 2FA (RESET)
+if(isset($_GET['abort_2fa'])) {
+    unset($_SESSION['pending_user_id']);
+    header("Location: index.php");
+    exit;
+}
+
+// D. ELABORAZIONE REGISTRAZIONE
+if(isset($_POST['register_username'])) {
+    $username = $_POST['register_username'];
+    $password = $_POST['register_password'];
+    $captcha_input = $_POST['captcha_input'];
+    $controllo_reg = false;
+
+    // Validazione Password (Hardening)
+    $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#!$])[A-Za-z\d@#!$]{8,12}$/';
+    if (!preg_match($pattern, $password)) {
+        echo "<script>alert('La password non rispetta i criteri di sicurezza.');</script>";
+        $controllo_reg = true;
+    }
+
+    // Verifica CAPTCHA
+    if ($captcha_input != $_SESSION['captcha_ans']) {
+        echo "<script>alert('CAPTCHA errato!');</script>";
+        $controllo_reg = true;
+    }
+
+    if (!$controllo_reg) {
+        $risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_username = '$username'");
+        if ($risultato->num_rows > 0) {
+            echo "<script>alert('Username non disponibile');</script>";
+        } else {
+            if($connessione->query("INSERT INTO utenti SET utenti_username='$username', utenti_password='$password'")){
+                echo "<script>alert('Registrazione effettuata!');</script>";
+                unset($_SESSION['captcha_ans']);
+            }
+        }
+    }
+}
+
+// E. ELABORAZIONE LOGIN - FASE 1 (Generazione OTP)
+if(isset($_POST['login_username'])) {
+    $username = $_POST['login_username'];
+    $password = $_POST['login_password'];
+
+    $risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_username = '$username' && utenti_password = '$password'");
+    $riga = $risultato->fetch_assoc();
+
+    if (isset($riga['utenti_username'])) {
+        $otp = rand(100000, 999999);
+        $scadenza = date("Y-m-d H:i:s", strtotime("+10 minutes"));
+        $id_utente = $riga['utenti_id'];
+
+        $connessione->query("UPDATE utenti SET otp_code = '$otp', otp_expiry = '$scadenza' WHERE utenti_id = '$id_utente'");
+        $_SESSION['pending_user_id'] = $id_utente; // Stato pendente per mostrare il form OTP
+        
+        // Log del tentativo (Fase 1 OK)
+        $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'attesa_2fa', '$username')");
+        
+        // Simulo l'invio via echo (in produzione andrebbe via mail)
+        $messaggio_otp = "Codice di verifica 2FA: $otp"; 
+    } else {
+        $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'fallimento', '$username')");
+        echo "<script>alert('Credenziali errate.');</script>";
+    }
+}
+
+// F. ELABORAZIONE 2FA - FASE 3 (Verifica finale)
+if(isset($_POST['verify_2fa'])) {
+    $otp_inserito = $_POST['otp_input'];
+    $user_id = $_SESSION['pending_user_id'];
+
+    $risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_id = '$user_id'");
+    $riga = $risultato->fetch_assoc();
+    $adesso = date("Y-m-d H:i:s");
+
+    if ($otp_inserito == $riga['otp_code'] && $adesso <= $riga['otp_expiry']) {
+        setcookie("utenti_id", $user_id, strtotime("+1 year"));
+        $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'successo', '".$riga['utenti_username']."')");
+        
+        unset($_SESSION['pending_user_id']);
+        $connessione->query("UPDATE utenti SET otp_code=NULL, otp_expiry=NULL WHERE utenti_id='$user_id'");
+        
+        header("location: index.php");
+        exit;
+    } else {
+        $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'fallimento_otp', '".$riga['utenti_username']."')");
+        echo "<script>alert('Codice errato o scaduto.');</script>";
+    }
+}
+
+// G. RECUPERO DATI UTENTE LOGGATO (Per visualizzazione)
+$cookie_riga = null;
+if(isset($_COOKIE['utenti_id'])){
+    $id = $_COOKIE['utenti_id'];
+    $cookie_risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_id='$id'");
+    $cookie_riga = $cookie_risultato->fetch_assoc();
+}
+
+// H. GENERAZIONE NUOVO CAPTCHA PER IL FORM
+$n1 = rand(1, 10);
+$n2 = rand(1, 10);
+$_SESSION['captcha_ans'] = $n1 + $n2;
+$_SESSION['captcha_string'] = "$n1 + $n2 = ?";
 ?>
 
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
-    <!-- CSS -->
+    <title>Tic Tac Toe - Cyber Security Version</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- FAVICON -->
-    <link rel="shortcut icon" href="favicon-32x32.png" type="image/x-icon">
-
-    <!-- FONT -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
-        rel="stylesheet">
 </head>
-
 <body>
-    <!-- SCHERMATA 0 -->
-    <div class="schermata-0">
+
+<!-- SCHERMATA 0: ACCESSO -->
+<div class="schermata-0">
+    <?php if(!isset($_COOKIE['utenti_id'])): ?>
         
-        <?php
-            if(!isset($_COOKIE['utenti_id'])){
-                ?>
-                <form method="POST">
-                    Registrati
-                    <input type="text" name="register_username" placeholder="username" required>
-                    <input type="text" name="register_password" placeholder="password" required>
-                    <button type="submit">Invia</button>
-                </form>
-                <form method="POST">
-                    Login
-                    <input type="text" name="login_username" placeholder="username" required>
-                    <input type="text" name="login_password" placeholder="password" required>
-                    <button type="submit">Invia</button>
-                </form>
-                <?php
-            }
-        ?>
-        
-    </div>
-
-    <?php
-        try {
-
-            // Avvio la connessione al database MySQL tramite la classe mysqli di PHP nella quale specifico 4 parametri (host,username,password,nome_database)
-            $connessione = new mysqli("localhost", "root", "root", "tic_tac_toe");
-
-        } catch (mysqli_sql_exception $e) {
-
-            echo "Errore di connessione: " . $e->getMessage();
-        }
-
-        $controllo = false;
-
-        if(isset($_POST['register_username'])) {
-
-            $username=$_POST['register_username'];
-            $password=$_POST['register_password'];
-            $risultato = $connessione->query("SELECT * FROM utenti");
-
-            while ($riga = $risultato->fetch_assoc()){
-                if($username==$riga['utenti_username']){
-                    echo "username non disponibile";
-                    $controllo = true;
-                    break;
-                }
-            }
-
-            // Invio la query per l'inserimento dei dati nel database
-            if ($controllo == false) {
-
-                if($connessione->query("INSERT INTO utenti SET utenti_username='$username', utenti_password='$password'")){
-                
-                    echo "Registrazione effettuata";
-                
-                } 
-            }
-            else {
-                $controllo = false;
-            }
-            
-        }
-
-        if(isset($_POST['login_username'])) {
-
-            $username=$_POST['login_username'];
-            $password=$_POST['login_password'];
-
-            $risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_username = '$username' && utenti_password = '$password'");
-
-            $riga = $risultato->fetch_assoc();
-
-            if (isset($riga['utenti_username'])) {
-
-                setcookie("utenti_id", $riga['utenti_id'], strtotime("+1 year"));
-
-                header("location: index.php");
-                
-            } else {
-                
-                echo "Credenziali errate";
-
-            }
-
-        }
-
-        if(!isset($_POST['login_username'])){
-
-            if(isset($_COOKIE['utenti_id']))
-            {
-                $id = $_COOKIE['utenti_id'];
-                $cookie_risultato = $connessione->query("SELECT * FROM utenti WHERE utenti_id='$id'");
-                $cookie_riga = $cookie_risultato->fetch_assoc();
-
-                echo "Benvenuto utente " . $cookie_riga['utenti_username'] . "<br>";
-
-                echo "<form METHOD = 'POST'>
-                        <button type='submit' name='logout'> logout </button>
-                    </form>";
-            }
-
-        }
-
-        if(isset($_POST['logout'])){
-
-            setcookie("utenti_id", "", strtotime("-1 hour"));
-            header("Location: index.php");
-            exit;
-        }
-
-        // Chiudo la connessione
-	    $connessione->close();
-    ?>
-
-    <!-- SCHERMATA 1 -->
-    <div class="schermata-1">
-        <div class="logo">
-            <h1>TIC TAC TOE</h1>
-            <p><span>BlackGroup</span> Edition</p>
-        </div>
-
-        <div class="user-input">
-            <input type="text" id="player1" placeholder="Player 1" value="<?php echo $cookie_riga['utenti_username'] ?>" disabled>
-            <input type="text" id="player2" placeholder="Player 2" value="Ospite" autocomplete="off" maxlength="12" disabled>
-        </div>
-
-        <div class="startBtn-container">
-            <button id="startBtn">Avvia Partita</button>
-        </div>
-    </div>
-    <!-- SCHERMATA 2 -->
-    <div class="schermata-2">
-        <div class="giocatori">
-            <div class="container-p1">
-                <div class="giocatore1"></div>
-                <div class="punteggio1">0</div>
-            </div>
-
-            <div class="container-round">
-                <p>ROUND</p>
-                <p id="round">1</p>
-            </div>
-
-            <div class="container-p2">
-                <div class="giocatore2"></div>
-                <div class="punteggio2">0</div>
-            </div>
-        </div>
-
-        <div class="griglia">
-            <div class="riga">
-                <div class="cella" id="item1"></div>
-                <div class="cella" id="item2"></div>
-                <div class="cella" id="item3"></div>
-            </div>
-            <div class="riga">
-                <div class="cella" id="item4"></div>
-                <div class="cella" id="item5"></div>
-                <div class="cella" id="item6"></div>
-            </div>
-            <div class="riga">
-                <div class="cella" id="item7"></div>
-                <div class="cella" id="item8"></div>
-                <div class="cella" id="item9"></div>
-            </div>
-
-            <div class="turn-container">
-                <p>Turno di :</p>
-                <p id="turnOf"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCHERMATA 3 -->
-    <div class="schermata-3">
-        <div class="result-container">
-
-            <h1 class="titolo"><i>Risultato</i></h1>
-
-            <div id="player-winner"></div>
-
-            <div class="player-score-container">
-
-                <div class="player-names">
-                    <div class="player-label x-label" id="labelX"></div>
-                    <div class="player-label o-label" id="labelO"></div>
+        <?php if(isset($_SESSION['pending_user_id'])): ?>
+            <!-- FASE 2: FORM INSERIMENTO OTP -->
+            <form method="POST">
+                <h3>Verifica Sicurezza (2FA)</h3>
+                <?php if(isset($messaggio_otp)) echo "<p style='color:#C1FF72;'>$messaggio_otp</p>"; ?>
+                <p>Inserisci il codice di 6 cifre ricevuto.</p>
+                <input type="text" name="otp_input" placeholder="000000" maxlength="6" required autofocus>
+                <button type="submit" name="verify_2fa">Verifica Codice</button>
+                <hr>
+                <p style="font-size: 0.8em;"><a href="index.php?abort_2fa=1" style="color: #C1CBD9;">Torna al Login</a></p>
+            </form>
+        <?php else: ?>
+            <!-- FASE 1: REGISTRAZIONE E LOGIN -->
+            <form method="POST">
+                <strong>Registrati</strong>
+                <input type="text" name="register_username" placeholder="username" required>
+                <input type="password" name="register_password" id="reg_password" placeholder="password" required>
+                <div style="margin: 10px 0; color: #C1CBD9;">
+                    <label>Risolvi: <?php echo $_SESSION['captcha_string']; ?></label>
+                    <input type="number" name="captcha_input" required>
                 </div>
-
-                <div class="player-scores">
-                    <div class="score-circle" id="scoreX"></div>
-                    <div class="score-circle" id="scoreO"></div>
+                <!-- Feedback password JS -->
+                <div id="password-feedback" style="font-size: 0.8em; text-align: left; margin: 10px 0;">
+                    <p id="len" class="invalid">● 8-12 caratteri</p>
+                    <p id="upper" class="invalid">● Una maiuscola</p>
+                    <p id="lower" class="invalid">● Una minuscola</p>
+                    <p id="num" class="invalid">● Un numero</p>
+                    <p id="spec" class="invalid">● Un carattere speciale (@, #, !, $)</p>
                 </div>
+                <button type="submit" id="reg_submit" disabled>Invia</button>
+            </form>
 
-            </div>
+            <hr style="border: 1px solid #444; margin: 20px 0;">
 
-            <hr class="score-divider">
+            <form method="POST">
+                <strong>Login</strong>
+                <input type="text" name="login_username" placeholder="username" required>
+                <input type="password" name="login_password" placeholder="password" required>
+                <button type="submit">Accedi</button>
+            </form>
+        <?php endif; ?>
 
-            <h2 class="mosse-title">Mosse:</h2>
+    <?php else: ?>
+        <!-- UTENTE LOGGATO -->
+        <p>Benvenuto utente <strong><?php echo $cookie_riga['utenti_username']; ?></strong></p>
+        <form method="POST">
+            <button type="submit" name="logout">Logout</button>
+        </form>
+    <?php endif; ?>
+</div>
 
-            <div class="history-container">
-                <div>
-                    <div class="round">Round 1</div>
-                    <p id="round1hystory"></p>
-                </div>
-                <div>
-                    <div class="round">Round 2</div>
-                    <p id="round2hystory"></p>
-                </div>
-                <div>
-                    <div class="round">Round 3</div>
-                    <p id="round3hystory"></p>
-                </div>
-            </div>
-
-            <div id="lista-mosse" class="mosse-list">
-
-            </div>
-
-            <button class="btn-ricomincia">
-                Ricomincia
-            </button>
-
-        </div>
-
+<!-- SCHERMATA 1: PREPARAZIONE PARTITA -->
+<div class="schermata-1 <?php echo !isset($_COOKIE['utenti_id']) ? 'hidden' : ''; ?>">
+    <div class="logo"><h1>TIC TAC TOE</h1><p><span>BlackGroup</span> Edition</p></div>
+    <div class="user-input">
+        <input type="text" id="player1" value="<?php echo $cookie_riga['utenti_username'] ?>" disabled>
+        <input type="text" id="player2" value="Ospite" disabled>
     </div>
+    <div class="startBtn-container"><button id="startBtn">Avvia Partita</button></div>
+</div>
+<!-- SCHERMATA 2 -->
+<div class="schermata-2">
+<div class="giocatori">
+<div class="container-p1">
+<div class="giocatore1"></div>
+<div class="punteggio1">0</div>
+</div>
+
+<div class="container-round">
+<p>ROUND</p>
+<p id="round">1</p>
+</div>
+
+<div class="container-p2">
+<div class="giocatore2"></div>
+<div class="punteggio2">0</div>
+</div>
+</div>
+
+<div class="griglia">
+<div class="riga">
+<div class="cella" id="item1"></div>
+<div class="cella" id="item2"></div>
+<div class="cella" id="item3"></div>
+</div>
+<div class="riga">
+<div class="cella" id="item4"></div>
+<div class="cella" id="item5"></div>
+<div class="cella" id="item6"></div>
+</div>
+<div class="riga">
+<div class="cella" id="item7"></div>
+<div class="cella" id="item8"></div>
+<div class="cella" id="item9"></div>
+</div>
+
+<div class="turn-container">
+<p>Turno di :</p>
+<p id="turnOf"></p>
+</div>
+</div>
+</div>
+
+<!-- SCHERMATA 3 -->
+<div class="schermata-3">
+<div class="result-container">
+
+<h1 class="titolo"><i>Risultato</i></h1>
+
+<div id="player-winner"></div>
+
+<div class="player-score-container">
+
+<div class="player-names">
+<div class="player-label x-label" id="labelX"></div>
+<div class="player-label o-label" id="labelO"></div>
+</div>
+
+<div class="player-scores">
+<div class="score-circle" id="scoreX"></div>
+<div class="score-circle" id="scoreO"></div>
+</div>
+
+</div>
+
+<hr class="score-divider">
+
+<h2 class="mosse-title">Mosse:</h2>
+
+<div class="history-container">
+<div>
+<div class="round">Round 1</div>
+<p id="round1hystory"></p>
+</div>
+<div>
+<div class="round">Round 2</div>
+<p id="round2hystory"></p>
+</div>
+<div>
+<div class="round">Round 3</div>
+<p id="round3hystory"></p>
+</div>
+</div>
+
+<div id="lista-mosse" class="mosse-list">
+
+</div>
+
+<button class="btn-ricomincia">
+Ricomincia
+</button>
+
+</div>
+
+</div>
 
 
-    <!-- ALERT PERSONALIZZATA E OVERLAY -->
-    <div id="customAlert" class="alert">
-        <p id="alertText"></p>
-        <button id="alertBtn">OK</button>
-    </div>
+<!-- ALERT PERSONALIZZATA E OVERLAY -->
+<div id="customAlert" class="alert">
+<p id="alertText"></p>
+<button id="alertBtn">OK</button>
+</div>
 
-    <div class="overlay"></div>
+<div class="overlay"></div>
 
-    <!-- SCRIPT -->
-    <script src="script.js"></script>
+<!-- SCRIPT -->
+<script src="script.js"></script>
 </body>
 
 </html>
