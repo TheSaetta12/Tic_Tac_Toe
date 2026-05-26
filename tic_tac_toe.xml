@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 5.2.3deb1
+- https://www.phpmyadmin.net
+-
+- Host: localhost:3306
+- Creato il: Mag 26, 2026 alle 12:02
+- Versione del server: 11.8.3-MariaDB-1+b1 from Debian
+- Versione PHP: 8.4.11
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="tic_tac_toe" collation="utf8mb4_uca1400_ai_ci" charset="utf8mb4">
+            <pma:table name="partite">
+                CREATE TABLE `partite` (
+                  `partite_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `partite_vinte` int(3) NOT NULL,
+                  `partite_perse` int(3) NOT NULL,
+                  `partite_pareggiate` int(3) NOT NULL,
+                  `utenti_id` int(11) NOT NULL,
+                  PRIMARY KEY (`partite_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+            </pma:table>
+            <pma:table name="tentativi_accesso">
+                CREATE TABLE `tentativi_accesso` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `ip_address` varchar(45) DEFAULT NULL,
+                  `tentativo_timestamp` timestamp NULL DEFAULT current_timestamp(),
+                  `esito` varchar(20) DEFAULT NULL,
+                  `username_coinvolto` varchar(50) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+            </pma:table>
+            <pma:table name="utenti">
+                CREATE TABLE `utenti` (
+                  `utenti_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `utenti_username` varchar(64) NOT NULL,
+                  `utenti_password` varchar(64) NOT NULL,
+                  `otp_code` varchar(6) DEFAULT NULL,
+                  `otp_expiry` datetime DEFAULT NULL,
+                  PRIMARY KEY (`utenti_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Database: 'tic_tac_toe'
+    -->
+    <database name="tic_tac_toe">
+        <!-- Tabella partite -->
+        <table name="partite">
+            <column name="partite_id">1</column>
+            <column name="partite_vinte">15</column>
+            <column name="partite_perse">8</column>
+            <column name="partite_pareggiate">7</column>
+            <column name="utenti_id">7</column>
+        </table>
+        <!-- Tabella tentativi_accesso -->
+        <table name="tentativi_accesso">
+            <column name="id">1</column>
+            <column name="ip_address">127.0.0.1</column>
+            <column name="tentativo_timestamp">2026-05-26 13:52:12</column>
+            <column name="esito">attesa_2fa</column>
+            <column name="username_coinvolto">Pietro</column>
+        </table>
+        <table name="tentativi_accesso">
+            <column name="id">2</column>
+            <column name="ip_address">127.0.0.1</column>
+            <column name="tentativo_timestamp">2026-05-26 13:52:22</column>
+            <column name="esito">successo</column>
+            <column name="username_coinvolto">Pietro</column>
+        </table>
+        <!-- Tabella utenti -->
+        <table name="utenti">
+            <column name="utenti_id">1</column>
+            <column name="utenti_username">Guido</column>
+            <column name="utenti_password">1234</column>
+            <column name="otp_code">NULL</column>
+            <column name="otp_expiry">NULL</column>
+        </table>
+        <table name="utenti">
+            <column name="utenti_id">5</column>
+            <column name="utenti_username">Tommaso</column>
+            <column name="utenti_password">4321</column>
+            <column name="otp_code">NULL</column>
+            <column name="otp_expiry">NULL</column>
+        </table>
+        <table name="utenti">
+            <column name="utenti_id">7</column>
+            <column name="utenti_username">Pietro</column>
+            <column name="utenti_password">5555</column>
+            <column name="otp_code">NULL</column>
+            <column name="otp_expiry">NULL</column>
+        </table>
+        <table name="utenti">
+            <column name="utenti_id">9</column>
+            <column name="utenti_username">pincopallino</column>
+            <column name="utenti_password">boh</column>
+            <column name="otp_code">NULL</column>
+            <column name="otp_expiry">NULL</column>
+        </table>
+        <table name="utenti">
+            <column name="utenti_id">17</column>
+            <column name="utenti_username">simone</column>
+            <column name="utenti_password">Simone1234!</column>
+            <column name="otp_code">NULL</column>
+            <column name="otp_expiry">NULL</column>
+        </table>
+    </database>
+</pma_xml_export>

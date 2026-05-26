@@ -1,0 +1,24 @@
+[
+{"type":"header","version":"5.2.3deb1","comment":"Export to JSON plugin for phpMyAdmin"},
+{"type":"database","name":"tic_tac_toe"},
+{"type":"table","name":"partite","database":"tic_tac_toe","data":
+[
+{"partite_id":"1","partite_vinte":"15","partite_perse":"8","partite_pareggiate":"7","utenti_id":"7"}
+]
+}
+,{"type":"table","name":"tentativi_accesso","database":"tic_tac_toe","data":
+[
+{"id":"1","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-26 13:52:12","esito":"attesa_2fa","username_coinvolto":"Pietro"},
+{"id":"2","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-26 13:52:22","esito":"successo","username_coinvolto":"Pietro"}
+]
+}
+,{"type":"table","name":"utenti","database":"tic_tac_toe","data":
+[
+{"utenti_id":"1","utenti_username":"Guido","utenti_password":"1234","otp_code":null,"otp_expiry":null},
+{"utenti_id":"5","utenti_username":"Tommaso","utenti_password":"4321","otp_code":null,"otp_expiry":null},
+{"utenti_id":"7","utenti_username":"Pietro","utenti_password":"5555","otp_code":null,"otp_expiry":null},
+{"utenti_id":"9","utenti_username":"pincopallino","utenti_password":"boh","otp_code":null,"otp_expiry":null},
+{"utenti_id":"17","utenti_username":"simone","utenti_password":"Simone1234!","otp_code":null,"otp_expiry":null}
+]
+}
+]
