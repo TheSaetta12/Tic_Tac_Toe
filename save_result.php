@@ -1,16 +1,13 @@
 <?php
-session_start();
-try {
+// 1. Inclusione della configurazione centralizzata
+// Questo file gestisce session_start(), la connessione $connessione e le variabili di sicurezza
+require_once 'db_config.php';
 
-    // Avvio la connessione al database MySQL tramite la classe mysqli di PHP nella quale specifico 4 parametri (host,username,password,nome_database)
-    $connessione = new mysqli("localhost", "root", "root", "tic_tac_toe");
+// Impostazione dell'header per la risposta JSON richiesta dallo script.js
+header('Content-Type: application/json');
 
-} catch (mysqli_sql_exception $e) {
-
-    echo "Errore di connessione: " . $e->getMessage();
-}
-
-// Verifica se l'utente è loggato
+// 2. Verifica Autenticazione
+// Verifichiamo la presenza del cookie utenti_id, che garantisce che l'utente abbia superato la 2FA
 if (!isset($_COOKIE['utenti_id'])) {
     echo json_encode(['success' => false, 'message' => 'Utente non autenticato']);
     exit;
@@ -18,26 +15,60 @@ if (!isset($_COOKIE['utenti_id'])) {
 
 $utentiId = $_COOKIE['utenti_id'];
 
-// Legge i dati inviati via Fetch (formato JSON)
+// 3. Recupero e Validazione Dati
+// Leggiamo il corpo della richiesta inviata tramite Fetch API
 $data = json_decode(file_get_contents('php://input'), true);
-$esito = $data['esito']; // 'vittoria', 'sconfitta' o 'pareggio'
 
-// Logica di aggiornamento DB (esempio semplificato su tabella utenti)
-if ($esito == 'vittoria') {
-    $sql = "UPDATE partite SET partite_vinte = partite_vinte + 1 WHERE utenti_id = '".$utentiId ."'";
-} elseif ($esito == 'pareggio') {
-    $sql = "UPDATE partite SET partite_pareggiate = partite_pareggiate + 1 WHERE utenti_id = '".$utentiId ."'";
-} elseif ($esito == 'sconfitta') {
-    $sql = "UPDATE partite SET partite_perse = partite_perse + 1 WHERE utenti_id  = '".$utentiId ."'";
+if (!isset($data['esito'])) {
+    echo json_encode(['success' => false, 'message' => 'Dati dell\'esito mancanti']);
+    exit;
 }
 
-$connessione->query($sql);
+$esito = $data['esito']; // 'vittoria', 'sconfitta' o 'pareggio'
 
-// Recupera le statistiche aggiornate per l'interfaccia
-$risultato = $connessione->query("SELECT partite_vinte, partite_perse, partite_pareggiate FROM partite WHERE utenti_id = '".$utentiId ."'");
-$stats = $risultato->fetch_assoc();
+// Mappatura sicura degli esiti sulle colonne della tabella 'partite'
+$colonne_valide = [
+    'vittoria' => 'partite_vinte',
+    'sconfitta' => 'partite_perse',
+    'pareggio' => 'partite_pareggiate'
+];
 
+if (!array_key_exists($esito, $colonne_valide)) {
+    echo json_encode(['success' => false, 'message' => 'Esito della partita non valido']);
+    exit;
+}
 
-// Restituisce le nuove statistiche in JSON
-echo json_encode(['success' => true, 'partite_vinte' => $stats['partite_vinte'], 'partite_pareggiate' => $stats['partite_pareggiate'], 'partite_perse' => $stats['partite_perse']]);
+$colonna_target = $colonne_valide[$esito];
+
+// 4. Aggiornamento Statistiche
+// Utilizziamo i prepared statements per evitare che utenti malintenzionati manipolino il cookie
+try {
+    $stmt_update = $connessione->prepare("UPDATE partite SET $colonna_target = $colonna_target + 1 WHERE utenti_id = ?");
+    $stmt_update->bind_param("i", $utentiId);
+    $stmt_update->execute();
+    $stmt_update->close();
+
+    // 5. Recupero Statistiche Aggiornate
+    // Interroghiamo il DB per restituire i nuovi valori totali all'interfaccia di gioco
+    $stmt_select = $connessione->prepare("SELECT partite_vinte, partite_perse, partite_pareggiate FROM partite WHERE utenti_id = ?");
+    $stmt_select->bind_param("i", $utentiId);
+    $stmt_select->execute();
+    $risultato = $stmt_select->get_result();
+    $stats = $risultato->fetch_assoc();
+    $stmt_select->close();
+
+    // Risposta finale inviata allo script.js
+    echo json_encode([
+        'success' => true,
+        'partite_vinte' => $stats['partite_vinte'],
+        'partite_pareggiate' => $stats['partite_pareggiate'],
+        'partite_perse' => $stats['partite_perse']
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Errore durante il salvataggio: ' . $e->getMessage()]);
+}
+
+// Chiusura della connessione
+$connessione->close();
 ?>

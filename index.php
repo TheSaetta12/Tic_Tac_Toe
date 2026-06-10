@@ -1,23 +1,8 @@
 <?php
-// 1. INIZIALIZZAZIONE E CONNESSIONE
-session_start(); // Fondamentale per CAPTCHA e 2FA
-error_reporting(E_ALL); // Attivato per il debug
+// Richiamo della configurazione centralizzata
+require_once 'db_config.php';
 
-$ip_utente = $_SERVER['REMOTE_ADDR']; // Recupero IP per Anti-Flood e Log
-$limite_tentativi = 5;
-$intervallo_minuti = 2;
-
-try {
-    $connessione = new mysqli("localhost", "root", "root", "tic_tac_toe");
-} catch (mysqli_sql_exception $e) {
-    die("Errore di connessione: " . $e->getMessage());
-}
-
-// ---------------------------------------------------------
-// 2. LOGICA DI CONTROLLO ACCESSI (BACKEND)
-// ---------------------------------------------------------
-
-// A. PROTEZIONE ANTI-FLOOD
+// --- PROTEZIONE ANTI-FLOOD ---
 $check_flood = $connessione->query("
     SELECT COUNT(*) as totale FROM tentativi_accesso 
     WHERE ip_address = '$ip_utente' 
@@ -30,35 +15,34 @@ if ($dati_flood['totale'] >= $limite_tentativi) {
     die("Troppi tentativi falliti. Il tuo IP ($ip_utente) è temporaneamente bloccato.");
 }
 
-// B. GESTIONE LOGOUT
+// --- LOGOUT ---
 if(isset($_POST['logout'])){
     setcookie("utenti_id", "", strtotime("-1 hour"));
     header("Location: index.php");
     exit;
 }
 
-// C. ANNULLAMENTO 2FA (RESET)
+// --- ANNULLAMENTO 2FA (RESET) ---
 if(isset($_GET['abort_2fa'])) {
     unset($_SESSION['pending_user_id']);
     header("Location: index.php");
     exit;
 }
 
-// D. ELABORAZIONE REGISTRAZIONE
+// --- ELABORAZIONE REGISTRAZIONE (Hardening & CAPTCHA) ---
 if(isset($_POST['register_username'])) {
     $username = $_POST['register_username'];
     $password = $_POST['register_password'];
     $captcha_input = $_POST['captcha_input'];
     $controllo_reg = false;
 
-    // Validazione Password (Hardening)
+    // Pattern complessità: 8-12 char, Maiusc, Minusc, Num, Spec (@#!$)
     $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#!$])[A-Za-z\d@#!$]{8,12}$/';
     if (!preg_match($pattern, $password)) {
         echo "<script>alert('La password non rispetta i criteri di sicurezza.');</script>";
         $controllo_reg = true;
     }
 
-    // Verifica CAPTCHA
     if ($captcha_input != $_SESSION['captcha_ans']) {
         echo "<script>alert('CAPTCHA errato!');</script>";
         $controllo_reg = true;
@@ -77,7 +61,7 @@ if(isset($_POST['register_username'])) {
     }
 }
 
-// E. ELABORAZIONE LOGIN - FASE 1 (Generazione OTP)
+// --- LOGIN (Generazione OTP & Logging) ---
 if(isset($_POST['login_username'])) {
     $username = $_POST['login_username'];
     $password = $_POST['login_password'];
@@ -91,20 +75,19 @@ if(isset($_POST['login_username'])) {
         $id_utente = $riga['utenti_id'];
 
         $connessione->query("UPDATE utenti SET otp_code = '$otp', otp_expiry = '$scadenza' WHERE utenti_id = '$id_utente'");
-        $_SESSION['pending_user_id'] = $id_utente; // Stato pendente per mostrare il form OTP
+        $_SESSION['pending_user_id'] = $id_utente;
         
-        // Log del tentativo (Fase 1 OK)
+        // Log dell'attesa 2FA
         $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'attesa_2fa', '$username')");
-        
-        // Simulo l'invio via echo (in produzione andrebbe via mail)
         $messaggio_otp = "Codice di verifica 2FA: $otp"; 
     } else {
+        // Log del fallimento credenziali
         $connessione->query("INSERT INTO tentativi_accesso (ip_address, esito, username_coinvolto) VALUES ('$ip_utente', 'fallimento', '$username')");
         echo "<script>alert('Credenziali errate.');</script>";
     }
 }
 
-// F. ELABORAZIONE 2FA - FASE 3 (Verifica finale)
+// --- 2FA(Verifica finale) ---
 if(isset($_POST['verify_2fa'])) {
     $otp_inserito = $_POST['otp_input'];
     $user_id = $_SESSION['pending_user_id'];
@@ -128,7 +111,7 @@ if(isset($_POST['verify_2fa'])) {
     }
 }
 
-// G. RECUPERO DATI UTENTE LOGGATO (Per visualizzazione)
+// --- RECUPERO DATI UTENTE ---
 $cookie_riga = null;
 if(isset($_COOKIE['utenti_id'])){
     $id = $_COOKIE['utenti_id'];
@@ -136,9 +119,8 @@ if(isset($_COOKIE['utenti_id'])){
     $cookie_riga = $cookie_risultato->fetch_assoc();
 }
 
-// H. GENERAZIONE NUOVO CAPTCHA PER IL FORM
-$n1 = rand(1, 10);
-$n2 = rand(1, 10);
+// --- GENERAZIONE CAPTCHA ---
+$n1 = rand(1, 10); $n2 = rand(1, 10);
 $_SESSION['captcha_ans'] = $n1 + $n2;
 $_SESSION['captcha_string'] = "$n1 + $n2 = ?";
 ?>
@@ -152,23 +134,19 @@ $_SESSION['captcha_string'] = "$n1 + $n2 = ?";
 </head>
 <body>
 
-<!-- SCHERMATA 0: ACCESSO -->
 <div class="schermata-0">
     <?php if(!isset($_COOKIE['utenti_id'])): ?>
-        
         <?php if(isset($_SESSION['pending_user_id'])): ?>
-            <!-- FASE 2: FORM INSERIMENTO OTP -->
+            <!-- FORM OTP -->
             <form method="POST">
                 <h3>Verifica Sicurezza (2FA)</h3>
                 <?php if(isset($messaggio_otp)) echo "<p style='color:#C1FF72;'>$messaggio_otp</p>"; ?>
-                <p>Inserisci il codice di 6 cifre ricevuto.</p>
                 <input type="text" name="otp_input" placeholder="000000" maxlength="6" required autofocus>
                 <button type="submit" name="verify_2fa">Verifica Codice</button>
-                <hr>
-                <p style="font-size: 0.8em;"><a href="index.php?abort_2fa=1" style="color: #C1CBD9;">Torna al Login</a></p>
+                <hr><p style="font-size: 0.8em;"><a href="index.php?abort_2fa=1" style="color: #C1CBD9;">Torna al Login</a></p>
             </form>
         <?php else: ?>
-            <!-- FASE 1: REGISTRAZIONE E LOGIN -->
+            <!-- REGISTRAZIONE E LOGIN -->
             <form method="POST">
                 <strong>Registrati</strong>
                 <input type="text" name="register_username" placeholder="username" required>
@@ -177,7 +155,6 @@ $_SESSION['captcha_string'] = "$n1 + $n2 = ?";
                     <label>Risolvi: <?php echo $_SESSION['captcha_string']; ?></label>
                     <input type="number" name="captcha_input" required>
                 </div>
-                <!-- Feedback password JS -->
                 <div id="password-feedback" style="font-size: 0.8em; text-align: left; margin: 10px 0;">
                     <p id="len" class="invalid">● 8-12 caratteri</p>
                     <p id="upper" class="invalid">● Una maiuscola</p>
@@ -187,9 +164,7 @@ $_SESSION['captcha_string'] = "$n1 + $n2 = ?";
                 </div>
                 <button type="submit" id="reg_submit" disabled>Invia</button>
             </form>
-
             <hr style="border: 1px solid #444; margin: 20px 0;">
-
             <form method="POST">
                 <strong>Login</strong>
                 <input type="text" name="login_username" placeholder="username" required>
@@ -197,25 +172,21 @@ $_SESSION['captcha_string'] = "$n1 + $n2 = ?";
                 <button type="submit">Accedi</button>
             </form>
         <?php endif; ?>
-
     <?php else: ?>
-        <!-- UTENTE LOGGATO -->
         <p>Benvenuto utente <strong><?php echo $cookie_riga['utenti_username']; ?></strong></p>
-        <form method="POST">
-            <button type="submit" name="logout">Logout</button>
-        </form>
+        <form method="POST"><button type="submit" name="logout">Logout</button></form>
     <?php endif; ?>
 </div>
 
-<!-- SCHERMATA 1: PREPARAZIONE PARTITA -->
 <div class="schermata-1 <?php echo !isset($_COOKIE['utenti_id']) ? 'hidden' : ''; ?>">
     <div class="logo"><h1>TIC TAC TOE</h1><p><span>BlackGroup</span> Edition</p></div>
     <div class="user-input">
-        <input type="text" id="player1" value="<?php echo $cookie_riga['utenti_username'] ?>" disabled>
+        <input type="text" id="player1" value="<?php echo isset($cookie_riga['utenti_username']) ? $cookie_riga['utenti_username'] : ''; ?>" disabled>
         <input type="text" id="player2" value="Ospite" disabled>
     </div>
     <div class="startBtn-container"><button id="startBtn">Avvia Partita</button></div>
 </div>
+
 <!-- SCHERMATA 2 -->
 <div class="schermata-2">
 <div class="giocatori">
