@@ -212,7 +212,7 @@ if (!isset($_SESSION['captcha_string']) || isset($_POST['register_username'])) {
                                 <input type="text" name="register_username" class="form-control mb-3 form-control-custom" placeholder="Username" required>
                                 <input type="password" name="register_password" id="reg_password" class="form-control mb-2 form-control-custom" placeholder="Password" required>
                                 <div id="password-feedback" class="mb-3">
-                                    <div id="len" class="invalid mb-1"><i class="fas fa-circle-xmark me-2"></i>8-12 caratteri [14]</div>
+                                    <div id="len" class="invalid mb-1"><i class="fas fa-circle-xmark me-2"></i>8-12 caratteri</div>
                                     <div id="upper" class="invalid mb-1"><i class="fas fa-circle-xmark me-2"></i>Maiuscola</div>
                                     <div id="lower" class="invalid mb-1"><i class="fas fa-circle-xmark me-2"></i>Minuscola</div>
                                     <div id="num" class="invalid mb-1"><i class="fas fa-circle-xmark me-2"></i>Numero</div>
