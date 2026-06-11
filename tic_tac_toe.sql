@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Creato il: Giu 10, 2026 alle 07:49
--- Versione del server: 11.8.3-MariaDB-1+b1 from Debian
--- Versione PHP: 8.4.11
+-- Generation Time: Jun 11, 2026 at 01:08 PM
+-- Server version: 11.8.3-MariaDB-1+b1 from Debian
+-- PHP Version: 8.4.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `partite`
+-- Table structure for table `partite`
 --
 
 CREATE TABLE `partite` (
@@ -36,61 +36,56 @@ CREATE TABLE `partite` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
--- Dump dei dati per la tabella `partite`
+-- Dumping data for table `partite`
 --
 
 INSERT INTO `partite` (`partite_id`, `partite_vinte`, `partite_perse`, `partite_pareggiate`, `utenti_id`) VALUES
-(1, 16, 9, 9, 7);
+(1, 18, 27, 10, 7),
+(2, 0, 0, 0, 20);
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `tentativi_accesso`
+-- Table structure for table `tentativi_accesso`
 --
 
 CREATE TABLE `tentativi_accesso` (
   `id` int(11) NOT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
+  `ip_address` varchar(45) NOT NULL,
   `tentativo_timestamp` timestamp NULL DEFAULT current_timestamp(),
-  `esito` varchar(20) DEFAULT NULL,
-  `username_coinvolto` varchar(50) DEFAULT NULL
+  `esito` varchar(50) NOT NULL,
+  `username_coinvolto` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
--- Dump dei dati per la tabella `tentativi_accesso`
+-- Dumping data for table `tentativi_accesso`
 --
 
 INSERT INTO `tentativi_accesso` (`id`, `ip_address`, `tentativo_timestamp`, `esito`, `username_coinvolto`) VALUES
-(1, '127.0.0.1', '2026-05-26 11:52:12', 'attesa_2fa', 'Pietro'),
-(2, '127.0.0.1', '2026-05-26 11:52:22', 'successo', 'Pietro'),
-(3, '127.0.0.1', '2026-05-27 07:02:29', 'attesa_2fa', 'Pietro'),
-(4, '127.0.0.1', '2026-05-27 07:02:47', 'successo', 'Pietro'),
-(5, '127.0.0.1', '2026-05-27 07:09:06', 'fallimento', 'Pietro'),
-(6, '127.0.0.1', '2026-05-27 07:09:13', 'fallimento', 'Pietro'),
-(7, '127.0.0.1', '2026-05-27 07:09:19', 'fallimento', 'Pietro'),
-(8, '127.0.0.1', '2026-05-27 07:09:25', 'fallimento', 'Pietro'),
-(9, '127.0.0.1', '2026-05-27 07:09:31', 'fallimento', 'Pietro'),
-(10, '127.0.0.1', '2026-05-27 07:22:28', 'fallimento', 'Pietro'),
-(11, '127.0.0.1', '2026-05-27 07:22:32', 'fallimento', 'Pietro'),
-(12, '127.0.0.1', '2026-05-27 07:23:15', 'attesa_2fa', 'Pietro'),
-(13, '127.0.0.1', '2026-05-27 07:23:20', 'successo', 'Pietro'),
-(14, '127.0.0.1', '2026-05-28 06:51:27', 'attesa_2fa', 'Pietro'),
-(15, '127.0.0.1', '2026-05-28 06:51:38', 'successo', 'Pietro'),
-(16, '127.0.0.1', '2026-05-28 07:14:43', 'attesa_2fa', 'Pietro'),
-(17, '127.0.0.1', '2026-05-28 07:14:52', 'successo', 'Pietro'),
-(18, '127.0.0.1', '2026-05-28 07:19:32', 'attesa_2fa', 'Pietro'),
-(19, '127.0.0.1', '2026-05-28 07:19:38', 'successo', 'Pietro'),
-(20, '127.0.0.1', '2026-05-28 07:21:53', 'attesa_2fa', 'Pietro'),
-(21, '127.0.0.1', '2026-05-28 07:21:59', 'successo', 'Pietro'),
-(22, '127.0.0.1', '2026-05-28 07:23:13', 'attesa_2fa', 'Pietro'),
-(23, '127.0.0.1', '2026-05-28 07:23:18', 'successo', 'Pietro'),
-(24, '127.0.0.1', '2026-06-10 07:47:42', 'attesa_2fa', 'Leon'),
-(25, '127.0.0.1', '2026-06-10 07:47:49', 'successo', 'Leon');
+(1, '127.0.0.1', '2026-06-11 12:39:25', 'fallimento_otp', 'Pietro'),
+(2, '127.0.0.1', '2026-06-11 12:39:34', 'fallimento', 'Pietro'),
+(3, '127.0.0.1', '2026-06-11 12:40:15', 'attesa_2fa', 'Leon'),
+(4, '127.0.0.1', '2026-06-11 12:40:21', 'fallimento_otp', 'Leon'),
+(5, '127.0.0.1', '2026-06-11 12:48:30', 'attesa_2fa', 'Pietro'),
+(6, '127.0.0.1', '2026-06-11 12:48:33', 'fallimento_otp', 'Pietro'),
+(7, '127.0.0.1', '2026-06-11 12:48:37', 'fallimento_otp', 'Pietro'),
+(8, '127.0.0.1', '2026-06-11 12:49:06', 'attesa_2fa', 'Pietro'),
+(9, '127.0.0.1', '2026-06-11 12:57:22', 'attesa_2fa', 'Pietro'),
+(10, '127.0.0.1', '2026-06-11 12:57:27', 'successo', 'Pietro'),
+(11, '127.0.0.1', '2026-06-11 12:57:35', 'attesa_2fa', 'Pietro'),
+(12, '127.0.0.1', '2026-06-11 12:57:38', 'fallimento_otp', 'Pietro'),
+(13, '127.0.0.1', '2026-06-11 12:57:44', 'successo', 'Pietro'),
+(14, '127.0.0.1', '2026-06-11 12:59:09', 'fallimento', 'Leon'),
+(15, '127.0.0.1', '2026-06-11 12:59:14', 'fallimento', 'Leon'),
+(16, '127.0.0.1', '2026-06-11 12:59:19', 'fallimento', 'Leon'),
+(17, '127.0.0.1', '2026-06-11 12:59:24', 'fallimento', 'Leon'),
+(18, '127.0.0.1', '2026-06-11 12:59:28', 'fallimento', 'Leon'),
+(19, '127.0.0.1', '2026-06-11 13:07:30', 'fallimento', 'Leon');
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `utenti`
+-- Table structure for table `utenti`
 --
 
 CREATE TABLE `utenti` (
@@ -102,7 +97,7 @@ CREATE TABLE `utenti` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dump dei dati per la tabella `utenti`
+-- Dumping data for table `utenti`
 --
 
 INSERT INTO `utenti` (`utenti_id`, `utenti_username`, `utenti_password`, `otp_code`, `otp_expiry`) VALUES
@@ -112,51 +107,52 @@ INSERT INTO `utenti` (`utenti_id`, `utenti_username`, `utenti_password`, `otp_co
 (9, 'pincopallino', 'boh', NULL, NULL),
 (17, 'simone', 'Simone1234!', NULL, NULL),
 (18, 'Albert', 'WEsker97@', NULL, NULL),
-(19, 'Leon', 'Kennedy12@', NULL, NULL);
+(19, 'Leon', 'Kennedy12@', '260540', '2026-06-11 12:50:15'),
+(20, 'Alex', 'Keny123@', NULL, NULL);
 
 --
--- Indici per le tabelle scaricate
+-- Indexes for dumped tables
 --
 
 --
--- Indici per le tabelle `partite`
+-- Indexes for table `partite`
 --
 ALTER TABLE `partite`
   ADD PRIMARY KEY (`partite_id`);
 
 --
--- Indici per le tabelle `tentativi_accesso`
+-- Indexes for table `tentativi_accesso`
 --
 ALTER TABLE `tentativi_accesso`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indici per le tabelle `utenti`
+-- Indexes for table `utenti`
 --
 ALTER TABLE `utenti`
   ADD PRIMARY KEY (`utenti_id`);
 
 --
--- AUTO_INCREMENT per le tabelle scaricate
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT per la tabella `partite`
+-- AUTO_INCREMENT for table `partite`
 --
 ALTER TABLE `partite`
-  MODIFY `partite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `partite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT per la tabella `tentativi_accesso`
+-- AUTO_INCREMENT for table `tentativi_accesso`
 --
 ALTER TABLE `tentativi_accesso`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
--- AUTO_INCREMENT per la tabella `utenti`
+-- AUTO_INCREMENT for table `utenti`
 --
 ALTER TABLE `utenti`
-  MODIFY `utenti_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `utenti_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -5,9 +5,9 @@
 - https://www.phpmyadmin.net
 -
 - Host: localhost:3306
-- Creato il: Giu 10, 2026 alle 07:50
-- Versione del server: 11.8.3-MariaDB-1+b1 from Debian
-- Versione PHP: 8.4.11
+- Generation Time: Jun 11, 2026 at 01:08 PM
+- Server version: 11.8.3-MariaDB-1+b1 from Debian
+- PHP Version: 8.4.11
 -->
 
 <pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
@@ -24,17 +24,17 @@
                   `partite_pareggiate` int(3) NOT NULL,
                   `utenti_id` int(11) NOT NULL,
                   PRIMARY KEY (`partite_id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+                ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
             </pma:table>
             <pma:table name="tentativi_accesso">
                 CREATE TABLE `tentativi_accesso` (
                   `id` int(11) NOT NULL AUTO_INCREMENT,
-                  `ip_address` varchar(45) DEFAULT NULL,
+                  `ip_address` varchar(45) NOT NULL,
                   `tentativo_timestamp` timestamp NULL DEFAULT current_timestamp(),
-                  `esito` varchar(20) DEFAULT NULL,
-                  `username_coinvolto` varchar(50) DEFAULT NULL,
+                  `esito` varchar(50) NOT NULL,
+                  `username_coinvolto` varchar(100) NOT NULL,
                   PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+                ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
             </pma:table>
             <pma:table name="utenti">
                 CREATE TABLE `utenti` (
@@ -44,7 +44,7 @@
                   `otp_code` varchar(6) DEFAULT NULL,
                   `otp_expiry` datetime DEFAULT NULL,
                   PRIMARY KEY (`utenti_id`)
-                ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+                ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             </pma:table>
         </pma:database>
     </pma:structure_schemas>
@@ -53,191 +53,156 @@
     - Database: 'tic_tac_toe'
     -->
     <database name="tic_tac_toe">
-        <!-- Tabella partite -->
+        <!-- Table partite -->
         <table name="partite">
             <column name="partite_id">1</column>
-            <column name="partite_vinte">16</column>
-            <column name="partite_perse">9</column>
-            <column name="partite_pareggiate">9</column>
+            <column name="partite_vinte">18</column>
+            <column name="partite_perse">27</column>
+            <column name="partite_pareggiate">10</column>
             <column name="utenti_id">7</column>
         </table>
-        <!-- Tabella tentativi_accesso -->
+        <table name="partite">
+            <column name="partite_id">2</column>
+            <column name="partite_vinte">0</column>
+            <column name="partite_perse">0</column>
+            <column name="partite_pareggiate">0</column>
+            <column name="utenti_id">20</column>
+        </table>
+        <!-- Table tentativi_accesso -->
         <table name="tentativi_accesso">
             <column name="id">1</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-26 13:52:12</column>
-            <column name="esito">attesa_2fa</column>
+            <column name="tentativo_timestamp">2026-06-11 14:39:25</column>
+            <column name="esito">fallimento_otp</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">2</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-26 13:52:22</column>
-            <column name="esito">successo</column>
+            <column name="tentativo_timestamp">2026-06-11 14:39:34</column>
+            <column name="esito">fallimento</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">3</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:02:29</column>
+            <column name="tentativo_timestamp">2026-06-11 14:40:15</column>
             <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">4</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:02:47</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:40:21</column>
+            <column name="esito">fallimento_otp</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">5</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:09:06</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:48:30</column>
+            <column name="esito">attesa_2fa</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">6</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:09:13</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:48:33</column>
+            <column name="esito">fallimento_otp</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">7</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:09:19</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:48:37</column>
+            <column name="esito">fallimento_otp</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">8</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:09:25</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:49:06</column>
+            <column name="esito">attesa_2fa</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">9</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:09:31</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:57:22</column>
+            <column name="esito">attesa_2fa</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">10</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:22:28</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:57:27</column>
+            <column name="esito">successo</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">11</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:22:32</column>
-            <column name="esito">fallimento</column>
+            <column name="tentativo_timestamp">2026-06-11 14:57:35</column>
+            <column name="esito">attesa_2fa</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">12</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:23:15</column>
-            <column name="esito">attesa_2fa</column>
+            <column name="tentativo_timestamp">2026-06-11 14:57:38</column>
+            <column name="esito">fallimento_otp</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">13</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-27 09:23:20</column>
+            <column name="tentativo_timestamp">2026-06-11 14:57:44</column>
             <column name="esito">successo</column>
             <column name="username_coinvolto">Pietro</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">14</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 08:51:27</column>
-            <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:59:09</column>
+            <column name="esito">fallimento</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">15</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 08:51:38</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:59:14</column>
+            <column name="esito">fallimento</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">16</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:14:43</column>
-            <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:59:19</column>
+            <column name="esito">fallimento</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">17</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:14:52</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:59:24</column>
+            <column name="esito">fallimento</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">18</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:19:32</column>
-            <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
+            <column name="tentativo_timestamp">2026-06-11 14:59:28</column>
+            <column name="esito">fallimento</column>
+            <column name="username_coinvolto">Leon</column>
         </table>
         <table name="tentativi_accesso">
             <column name="id">19</column>
             <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:19:38</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
-        </table>
-        <table name="tentativi_accesso">
-            <column name="id">20</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:21:53</column>
-            <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
-        </table>
-        <table name="tentativi_accesso">
-            <column name="id">21</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:21:59</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
-        </table>
-        <table name="tentativi_accesso">
-            <column name="id">22</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:23:13</column>
-            <column name="esito">attesa_2fa</column>
-            <column name="username_coinvolto">Pietro</column>
-        </table>
-        <table name="tentativi_accesso">
-            <column name="id">23</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-05-28 09:23:18</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Pietro</column>
-        </table>
-        <table name="tentativi_accesso">
-            <column name="id">24</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-06-10 09:47:42</column>
-            <column name="esito">attesa_2fa</column>
+            <column name="tentativo_timestamp">2026-06-11 15:07:30</column>
+            <column name="esito">fallimento</column>
             <column name="username_coinvolto">Leon</column>
         </table>
-        <table name="tentativi_accesso">
-            <column name="id">25</column>
-            <column name="ip_address">127.0.0.1</column>
-            <column name="tentativo_timestamp">2026-06-10 09:47:49</column>
-            <column name="esito">successo</column>
-            <column name="username_coinvolto">Leon</column>
-        </table>
-        <!-- Tabella utenti -->
+        <!-- Table utenti -->
         <table name="utenti">
             <column name="utenti_id">1</column>
             <column name="utenti_username">Guido</column>
@@ -284,6 +249,13 @@
             <column name="utenti_id">19</column>
             <column name="utenti_username">Leon</column>
             <column name="utenti_password">Kennedy12@</column>
+            <column name="otp_code">260540</column>
+            <column name="otp_expiry">2026-06-11 12:50:15</column>
+        </table>
+        <table name="utenti">
+            <column name="utenti_id">20</column>
+            <column name="utenti_username">Alex</column>
+            <column name="utenti_password">Keny123@</column>
             <column name="otp_code">NULL</column>
             <column name="otp_expiry">NULL</column>
         </table>

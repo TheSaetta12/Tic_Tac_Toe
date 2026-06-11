@@ -3,36 +3,31 @@
 {"type":"database","name":"tic_tac_toe"},
 {"type":"table","name":"partite","database":"tic_tac_toe","data":
 [
-{"partite_id":"1","partite_vinte":"16","partite_perse":"9","partite_pareggiate":"9","utenti_id":"7"}
+{"partite_id":"1","partite_vinte":"18","partite_perse":"27","partite_pareggiate":"10","utenti_id":"7"},
+{"partite_id":"2","partite_vinte":"0","partite_perse":"0","partite_pareggiate":"0","utenti_id":"20"}
 ]
 }
 ,{"type":"table","name":"tentativi_accesso","database":"tic_tac_toe","data":
 [
-{"id":"1","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-26 13:52:12","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"2","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-26 13:52:22","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"3","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:02:29","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"4","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:02:47","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"5","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:09:06","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"6","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:09:13","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"7","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:09:19","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"8","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:09:25","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"9","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:09:31","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"10","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:22:28","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"11","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:22:32","esito":"fallimento","username_coinvolto":"Pietro"},
-{"id":"12","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:23:15","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"13","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-27 09:23:20","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"14","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 08:51:27","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"15","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 08:51:38","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"16","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:14:43","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"17","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:14:52","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"18","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:19:32","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"19","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:19:38","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"20","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:21:53","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"21","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:21:59","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"22","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:23:13","esito":"attesa_2fa","username_coinvolto":"Pietro"},
-{"id":"23","ip_address":"127.0.0.1","tentativo_timestamp":"2026-05-28 09:23:18","esito":"successo","username_coinvolto":"Pietro"},
-{"id":"24","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-10 09:47:42","esito":"attesa_2fa","username_coinvolto":"Leon"},
-{"id":"25","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-10 09:47:49","esito":"successo","username_coinvolto":"Leon"}
+{"id":"1","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:39:25","esito":"fallimento_otp","username_coinvolto":"Pietro"},
+{"id":"2","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:39:34","esito":"fallimento","username_coinvolto":"Pietro"},
+{"id":"3","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:40:15","esito":"attesa_2fa","username_coinvolto":"Leon"},
+{"id":"4","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:40:21","esito":"fallimento_otp","username_coinvolto":"Leon"},
+{"id":"5","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:48:30","esito":"attesa_2fa","username_coinvolto":"Pietro"},
+{"id":"6","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:48:33","esito":"fallimento_otp","username_coinvolto":"Pietro"},
+{"id":"7","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:48:37","esito":"fallimento_otp","username_coinvolto":"Pietro"},
+{"id":"8","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:49:06","esito":"attesa_2fa","username_coinvolto":"Pietro"},
+{"id":"9","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:57:22","esito":"attesa_2fa","username_coinvolto":"Pietro"},
+{"id":"10","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:57:27","esito":"successo","username_coinvolto":"Pietro"},
+{"id":"11","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:57:35","esito":"attesa_2fa","username_coinvolto":"Pietro"},
+{"id":"12","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:57:38","esito":"fallimento_otp","username_coinvolto":"Pietro"},
+{"id":"13","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:57:44","esito":"successo","username_coinvolto":"Pietro"},
+{"id":"14","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:59:09","esito":"fallimento","username_coinvolto":"Leon"},
+{"id":"15","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:59:14","esito":"fallimento","username_coinvolto":"Leon"},
+{"id":"16","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:59:19","esito":"fallimento","username_coinvolto":"Leon"},
+{"id":"17","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:59:24","esito":"fallimento","username_coinvolto":"Leon"},
+{"id":"18","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 14:59:28","esito":"fallimento","username_coinvolto":"Leon"},
+{"id":"19","ip_address":"127.0.0.1","tentativo_timestamp":"2026-06-11 15:07:30","esito":"fallimento","username_coinvolto":"Leon"}
 ]
 }
 ,{"type":"table","name":"utenti","database":"tic_tac_toe","data":
@@ -43,7 +38,8 @@
 {"utenti_id":"9","utenti_username":"pincopallino","utenti_password":"boh","otp_code":null,"otp_expiry":null},
 {"utenti_id":"17","utenti_username":"simone","utenti_password":"Simone1234!","otp_code":null,"otp_expiry":null},
 {"utenti_id":"18","utenti_username":"Albert","utenti_password":"WEsker97@","otp_code":null,"otp_expiry":null},
-{"utenti_id":"19","utenti_username":"Leon","utenti_password":"Kennedy12@","otp_code":null,"otp_expiry":null}
+{"utenti_id":"19","utenti_username":"Leon","utenti_password":"Kennedy12@","otp_code":"260540","otp_expiry":"2026-06-11 12:50:15"},
+{"utenti_id":"20","utenti_username":"Alex","utenti_password":"Keny123@","otp_code":null,"otp_expiry":null}
 ]
 }
 ]
