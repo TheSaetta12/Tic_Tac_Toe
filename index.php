@@ -40,7 +40,7 @@ if (isset($_POST['register_username'])) {
     // 1. Validazione Password (8-12 char, Maiusc, Minusc, Num, Spec)
     $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#!$])[A-Za-z\d@#!$]{8,12}$/';
     if (!preg_match($pattern, $password)) {
-        echo "<script>alert('Criteri password non rispettati [2].');</script>";
+        echo "<script>alert('Criteri password non rispettati.');</script>";
         $controllo_reg = true;
     }
 
